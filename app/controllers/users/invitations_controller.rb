@@ -8,9 +8,9 @@ class Users::InvitationsController < Devise::InvitationsController
     resource.save!
     resource_invited = resource.invite!(current_user)
     if resource_invited
-      render json: { message: 'invitation mail sent' }
+      render json: { message: 'invitation mail sent', success: true, data: {} }
     else
-      render json: { message: 'failed to invite' }
+      render json: { message: 'failed to invite', success: false, data: {} }
     end
   end
 
@@ -18,9 +18,9 @@ class Users::InvitationsController < Devise::InvitationsController
     self.resource = resource_class.accept_invitation!(invite_resource_params)
     if !resource.errors.present?
       yield resource if block_given?
-      render json: { user: resource, message: 'registered successfully' }
+      render json: { user: resource, message: 'registered successfully', success: true, data: {} }
     else
-      render json: { message: 'failed to accept' }
+      render json: { message: 'failed to accept', success: false, data: {} }
     end
   end
 
@@ -33,6 +33,6 @@ class Users::InvitationsController < Devise::InvitationsController
   def authorize_user
     # Check if the current user has the necessary permissions
     # Redirect or raise an error if not authorized
-    return render json: { message: 'You don\'t have access right to invite users' } unless current_user.admin?
+    return render json: { message: 'You don\'t have access right to invite users', success: false, data: {} } unless current_user.admin?
   end
 end

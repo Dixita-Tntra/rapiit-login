@@ -7,13 +7,13 @@ application up and running.
 
 Things you may want to cover:
 
-* Ruby version
+* Ruby version - "3.1.2"
 
 * System dependencies
 
 * Configuration
 
-* Database creation
+* Database creation - "rails db:setup"
 
 * Database initialization
 
