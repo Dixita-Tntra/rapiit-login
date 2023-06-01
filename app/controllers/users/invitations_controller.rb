@@ -3,9 +3,14 @@ class Users::InvitationsController < Devise::InvitationsController
   before_action :authorize_user, only: [:create]
 
   def create
-    resource = resource_class.new(email: invite_resource_params[:email])
+    resource = resource_class.find_or_initialize_by(email: invite_resource_params[:email])
+
+    return render json: { message: 'user already invited', success: false, data: {} } if resource.persisted?
+
     resource.password = '123456'
     resource.save!
+    resource.departments << Department.find_by(name: invite_resource_params[:department])
+    resource.roles << Role.find_by(name: invite_resource_params[:role])
     resource_invited = resource.invite!(current_user)
     if resource_invited
       render json: { message: 'invitation mail sent', success: true, data: {} }
@@ -27,12 +32,15 @@ class Users::InvitationsController < Devise::InvitationsController
   private
 
   def invite_resource_params
-    params.require(:user).permit(:email, :invitation_token, :password)
+    params.require(:user).permit(:email, :invitation_token, :password, :department, :role)
   end
 
   def authorize_user
     # Check if the current user has the necessary permissions
     # Redirect or raise an error if not authorized
-    return render json: { message: 'You don\'t have access right to invite users', success: false, data: {} } unless current_user.admin?
+    return if current_user.admin?
+
+    render json: { message: 'You don\'t have access right to invite users', success: false,
+                   data: {} }
   end
 end
