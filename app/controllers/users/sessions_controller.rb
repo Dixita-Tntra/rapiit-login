@@ -11,7 +11,9 @@ class Users::SessionsController < Devise::SessionsController
 
     if @user.valid_password?(sign_in_params[:password])
       sign_in User, @user
-      render json: { messages: 'Signed In Successfully', success: true, data: {} }
+
+      render json: { messages: 'Signed In Successfully', success: true,
+                     data: { role: @user.admin? ? 'admin' : 'user' } }
     else
       render json: { message: 'Please enter a valid password' }
     end
