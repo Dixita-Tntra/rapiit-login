@@ -13,9 +13,12 @@ Things you may want to cover:
 
 * Configuration
 
-* Database creation - "rails db:setup"
+* Database creation
+> rails db:setup
 
 * Database initialization
+> rails db:migrate
+> rails db:seed
 
 * How to run the test suite
 
