@@ -14,6 +14,9 @@ class Users::SessionsController < Devise::SessionsController
 
       render json: { messages: 'Signed In Successfully', success: true,
                      data: { role: @user.admin? ? 'admin' : 'user' } }
+    elsif @user.persisted? && @user.invitation_accepted_at.nil?
+      render json: { messages: 'please first accept invitation mail sent', success: false,
+                     data: {} }
     else
       render json: { message: 'Please enter a valid password', success: false, data: {} }
     end
