@@ -4,36 +4,37 @@ class Users::InvitationsController < Devise::InvitationsController
 
   def create
     resource = resource_class.find_or_initialize_by(email: invite_resource_params[:email])
-
-    if resource.invitation_sent_at.present? && !resource.invitation_accepted_at.nil?
-      return render json: { message: 'user already invited', success: false,
-                            data: {} }
+    if resource.persisted?
+      if resource.invited_to_sign_up? && resource.invitation_accepted?
+        return render json: { message: 'User Already Invited',
+                              success: false }
+      end
+    else
+      resource.password = '123456'
+      resource.departments << Department.find_by(name: invite_resource_params[:department])
+      resource.roles << Role.find_by(name: invite_resource_params[:role])
     end
-
-    resource.password = '123456'
-    resource.departments << Department.find_by(name: invite_resource_params[:department])
-    resource.roles << Role.find_by(name: invite_resource_params[:role])
     resource.save!
     resource_invited = resource.invite!(current_user)
     if resource_invited
-      render json: { message: 'invitation mail sent', success: true, data: {} }
+      render json: { message: 'Invitation Mail Sent', success: true }
     else
-      render json: { message: 'failed to invite', success: false, data: {} }
+      render json: { message: 'Failed To Invite', success: false }
     end
   end
 
   def accept_invite
-    self.resource = resource_class.accept_invitation!(invite_resource_params)
+    user = resource_class.find_by(email: invite_resource_params[:email])
+    return render json: { message: 'already accepted', success: false } if user.invitation_accepted?
 
+    self.resource = resource_class.accept_invitation!(invite_resource_params)
     if !resource.errors.present?
       yield resource if block_given?
-      render json: { user: resource, message: 'registered successfully', success: true, data: {} }
-    elsif resource.invitation_accepted_at.present?
-      render json: { message: 'already accepted', success: false, data: {} }
-    elsif resource.invitation_due_at < DateTime.now
-      render json: { message: 'invitation token expired', success: false, data: {} }
+      render json: { user: resource, message: 'Registered Successfully', success: true }
+    elsif resource.invitation_due_at.before?(DateTime.now)
+      render json: { message: 'Invitation Token Expired', success: false }
     else
-      render json: { message: 'failed to accept', success: false, data: {} }
+      render json: { message: 'Failed To Accept', success: false }
     end
   end
 
@@ -48,7 +49,6 @@ class Users::InvitationsController < Devise::InvitationsController
     # Redirect or raise an error if not authorized
     return if current_user.admin?
 
-    render json: { message: 'You don\'t have access right to invite users', success: false,
-                   data: {} }
+    render json: { message: 'You Don\'t Have Access Right To Invite Users', success: false }
   end
 end

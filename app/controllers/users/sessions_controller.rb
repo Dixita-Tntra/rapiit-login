@@ -7,18 +7,17 @@ class Users::SessionsController < Devise::SessionsController
   def create
     @user = User.find_for_database_authentication(email: sign_in_params[:email])
 
-    return render json: { messages: 'Please enter a valid email', success: false, data: {} } unless @user.present?
+    return render json: { message: 'User doesn\'t exist', success: false } unless @user.present?
 
     if @user.valid_password?(sign_in_params[:password])
       sign_in User, @user
 
-      render json: { messages: 'Signed In Successfully', success: true,
+      render json: { message: 'Signed In Successfully', success: true,
                      data: { role: @user.admin? ? 'admin' : 'user' } }
     elsif @user.persisted? && @user.invitation_accepted_at.nil?
-      render json: { messages: 'please first accept invitation mail sent', success: false,
-                     data: {} }
+      render json: { message: 'Accept invitation mail sent', success: false }
     else
-      render json: { message: 'Please enter a valid password', success: false, data: {} }
+      render json: { message: 'Please enter a valid password', success: false }
     end
   end
 
@@ -26,9 +25,9 @@ class Users::SessionsController < Devise::SessionsController
   def destroy
     signed_out = (Devise.sign_out_all_scopes ? sign_out : sign_out(resource_name))
     if signed_out
-      render json: { messages: 'Signed Out Successfully', success: true, data: {} }
+      render json: { message: 'Signed Out Successfully', success: true }
     else
-      render json: { messages: 'Failed to Sign-Out', success: false, data: {} }
+      render json: { message: 'Failed to Sign-Out', success: false }
     end
   end
 
