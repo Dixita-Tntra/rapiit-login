@@ -9,4 +9,7 @@ Rails.application.routes.draw do
 
   get 'users/departments', to: 'users#user_departments'
   get 'users/roles', to: 'users#user_roles'
+  get 'process/index', to: 'process#index'
+  get 'history/index', to: 'history#index'
+  post 'history/create', to: 'history#create'
 end
