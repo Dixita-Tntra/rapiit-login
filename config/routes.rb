@@ -10,4 +10,5 @@ Rails.application.routes.draw do
 
   get 'users/departments', to: 'users#user_departments'
   get 'users/roles', to: 'users#user_roles'
+  put 'users/change_password', to: 'users#change_password'
 end
