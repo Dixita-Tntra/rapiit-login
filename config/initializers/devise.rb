@@ -24,7 +24,7 @@ Devise.setup do |config|
   # Configure the e-mail address which will be shown in Devise::Mailer,
   # note that it will be overwritten if you use your own mailer class
   # with default "from" parameter.
-  config.mailer_sender = 'test@rapiit.com'
+  config.mailer_sender = Rails.application.credentials.mailer.username
 
   # Configure the class responsible to send e-mails.
   # config.mailer = 'Devise::Mailer'
@@ -138,7 +138,7 @@ Devise.setup do |config|
   # The period the generated invitation token is valid.
   # After this period, the invited resource won't be able to accept the invitation.
   # When invite_for is 0 (the default), the invitation won't expire.
-  # config.invite_for = 2.weeks
+  config.invite_for = 1.day
 
   # Number of invitations users can send.
   # - If invitation_limit is nil, there is no limit for invitations, users can
@@ -158,7 +158,7 @@ Devise.setup do |config|
   # Ensure that invited record is valid.
   # The invitation won't be sent if this check fails.
   # Default: false
-  # config.validate_on_invite = true
+  config.validate_on_invite = true
 
   # Resend invitation if user with invited status is invited again
   # Default: true
@@ -232,7 +232,7 @@ Devise.setup do |config|
   # Email regex used to validate email formats. It simply asserts that
   # one (and only one) @ exists in the given string. This is mainly
   # to give user feedback and not to assert the e-mail validity.
-  config.email_regexp = /\A[^@\s]+@[^@\s]+\z/
+  config.email_regexp = /\A[^@\s]+@tntra.io\z/
 
   # ==> Configuration for :timeoutable
   # The time you want to timeout the user session without activity. After this
