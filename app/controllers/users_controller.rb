@@ -1,9 +1,9 @@
 class UsersController < ApplicationController
   def change_password
     if current_user.update_with_password(change_password_params)
-      render json: { user: current_user, message: I18n.t('success.update', resource: 'Password'), success: false }
+      render json: { user: current_user, message: 'password changed successfully', success: true }
     else
-      render json: { data: [], message: I18n.t('authorization.unauthorize'), success: false }
+      render json: { data: [], message: 'failed to change your password', success: false }
     end
   end
 
