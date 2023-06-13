@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_06_01_113019) do
+ActiveRecord::Schema[7.0].define(version: 2023_06_06_053300) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -25,6 +25,43 @@ ActiveRecord::Schema[7.0].define(version: 2023_06_01_113019) do
     t.bigint "department_id", null: false
     t.index ["department_id", "user_id"], name: "index_departments_users_on_department_id_and_user_id"
     t.index ["user_id", "department_id"], name: "index_departments_users_on_user_id_and_department_id"
+  end
+
+  create_table "histories", force: :cascade do |t|
+    t.bigint "order_id", null: false
+    t.bigint "instruction_id", null: false
+    t.jsonb "fields"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["instruction_id"], name: "index_histories_on_instruction_id"
+    t.index ["order_id"], name: "index_histories_on_order_id"
+  end
+
+  create_table "instructions", force: :cascade do |t|
+    t.bigint "order_process_id", null: false
+    t.string "process_instructions"
+    t.string "comments"
+    t.string "name"
+    t.integer "status"
+    t.string "sheet_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["order_process_id"], name: "index_instructions_on_order_process_id"
+  end
+
+  create_table "order_processes", force: :cascade do |t|
+    t.string "name"
+    t.bigint "order_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["order_id"], name: "index_order_processes_on_order_id"
+  end
+
+  create_table "orders", force: :cascade do |t|
+    t.string "name"
+    t.integer "order_type"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "roles", force: :cascade do |t|
@@ -63,4 +100,8 @@ ActiveRecord::Schema[7.0].define(version: 2023_06_01_113019) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  add_foreign_key "histories", "instructions"
+  add_foreign_key "histories", "orders"
+  add_foreign_key "instructions", "order_processes"
+  add_foreign_key "order_processes", "orders"
 end
